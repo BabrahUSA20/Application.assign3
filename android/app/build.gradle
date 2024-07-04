@@ -1,0 +1,76 @@
+plugins {id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    // ... other plugins ...
+    id 'dev.flutter.flutter-gradle-plugin'
+}
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+
+android {
+    compileSdkVersion 34
+    namespace 'com.example.app' // Replace with your actual package name
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8' // You can adjust this if needed
+    }
+
+    defaultConfig {
+        applicationId "com.example.app" // Replace with your actual application ID
+        minSdkVersion 23
+        targetSdkVersion flutter.targetSdkVersion
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    // Force Kotlin version for dependencies
+    configurations.all {
+        resolutionStrategy {
+            eachDependency { details ->
+                if (details.requested.group == 'org.jetbrains.kotlin' &&
+                        details.requested.name.startsWith('kotlin-stdlib')) {
+                    details.useVersion '1.7.1' // Use your desired Kotlin version here
+                }
+            }
+        }
+    }
+}
+
+android {dependencies {
+    implementation platform('com.google.firebase:firebase-bom:33.1.1')
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-firestore'
+}
+}
+
+flutter {
+    source '../..'
+}
+
+apply plugin: 'com.google.gms.google-services'
